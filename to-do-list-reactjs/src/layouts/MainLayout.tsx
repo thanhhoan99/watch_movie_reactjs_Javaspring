@@ -17,7 +17,7 @@ export default function MainLayout() {
   const { loggedInUser, logOut } = useAuthStore((state) => state);
 
   const userRoles: string[] =
-    loggedInUser?.roles?.map((role: any) => role.code.toLowerCase()) || [];
+    loggedInUser?.roles?.map((role: any) => role.name.toLowerCase()) || [];
 
   const buildMenuItems = (routes: any[]) => {
     return routes.flatMap((route) => {

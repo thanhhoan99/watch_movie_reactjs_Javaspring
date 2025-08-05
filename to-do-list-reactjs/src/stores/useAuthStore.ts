@@ -7,13 +7,11 @@ import { apiClient } from '../libraries/api-client';
 export interface LoggedInUser {
   id: string | number;
   username: string;
-  isActive: boolean;
-  roles: [
-    {
-      id: string | number;
-      name: string;
-    }
-  ];
+  isActive: boolean | null;
+  roles: {
+    id: string | number;
+    name: string;
+  }[];
 }
 
 export interface AuthState {
@@ -53,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
               );
 
               const response: any = (await apiClient.post('/auth/login', { username, password })) as any;
-
+               console.log('Login response:', response); // DEBUG ở đây nếu muốn
               set(
                 {
                   access_token: response.access_token,
@@ -66,6 +64,7 @@ export const useAuthStore = create<AuthState>()(
                 { type: '@AUTH/LOGIN/SUCCESS' }
               );
             } catch (error) {
+           
               set({ error, access_token: undefined, refresh_token: undefined, loggedInUser: undefined }, false, {
                 type: '@AUTH/LOGIN/ERROR',
               });

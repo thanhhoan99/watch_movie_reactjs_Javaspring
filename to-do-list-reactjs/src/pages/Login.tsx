@@ -1,31 +1,31 @@
-// src/pages/Login.tsx
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-
 import { yupResolver } from '@hookform/resolvers/yup';
-
 import { useAuthStore } from '../stores/useAuthStore';
+import { useState } from 'react';
 
-// Strong typed interface for form data
 interface IFormInput {
   username: string;
   password: string;
 }
 
-// Yup validation schema with strong typing
 const validationSchema: yup.ObjectSchema<IFormInput> = yup.object({
   username: yup
     .string()
-    .required('Email is required')
-    .email('Please enter a valid email address')
-    .min(5, 'Email must be at least 5 characters')
-    .max(100, 'Email must be less than 100 characters'),
-  password: yup.string().required('Password is required').min(6, 'Password must be at least 6 characters').max(50, 'Password must be less than 50 characters'),
+    .required('Username is required')
+    .min(5, 'Username must be at least 5 characters')
+    .max(100, 'Username must be less than 100 characters'),
+  password: yup
+    .string()
+    .required('Password is required')
+    .min(6, 'Password must be at least 6 characters')
+    .max(50, 'Password must be less than 50 characters'),
 });
 
 export default function Login() {
-  const { login, error } = useAuthStore((state) => state);
+  const { login } = useAuthStore((state) => state);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const {
     register,
@@ -33,24 +33,29 @@ export default function Login() {
     formState: { errors, isSubmitting, isValid, dirtyFields },
   } = useForm<IFormInput>({
     resolver: yupResolver(validationSchema),
-    mode: 'onChange', // Validate on change for better UX
+    mode: 'onChange',
     defaultValues: {
-      username: 'tungnt@softech.vn',
-      password: '123456789', // Example default value
+      username: 'Administrators',
+      password: '123456',
     },
   });
 
   const onSubmit = async (data: IFormInput): Promise<void> => {
-    login({
-      username: data.username,
-      password: data.password,
-    }).then(() => {
-      // Redirect to home page after successful login
-      window.location.href = '/home';
-    });
-  };
+    try {
+      setLoginError(null); // Clear previous errors
+      await login({ username: data.username, password: data.password });
 
-  console.log('Login error:', error);
+      const { error } = useAuthStore.getState();
+      if (!error) {
+        window.location.href = '/home';
+      } else {
+        setLoginError(error?.response?.data?.message || 'Login failed.');
+      }
+    } catch (err: any) {
+      console.error('Login failed:', err);
+      setLoginError(err?.response?.data?.message || 'Something went wrong.');
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -68,7 +73,7 @@ export default function Login() {
             className={`w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 transition-colors ${
               errors.username
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
-                : !errors.username && dirtyFields.username
+                : dirtyFields.username
                 ? 'border-green-500 focus:border-green-500 focus:ring-green-200'
                 : 'border-gray-300 focus:border-blue-500 focus:ring-blue-200'
             }`}
@@ -88,7 +93,7 @@ export default function Login() {
             className={`w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 transition-colors ${
               errors.password
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
-                : !errors.password && dirtyFields.password
+                : dirtyFields.password
                 ? 'border-green-500 focus:border-green-500 focus:ring-green-200'
                 : 'border-gray-300 focus:border-blue-500 focus:ring-blue-200'
             }`}
@@ -107,16 +112,16 @@ export default function Login() {
           {isSubmitting ? 'Logging in...' : 'Login'}
         </button>
 
-        {/* Form validation status indicator */}
         <div className="mt-4 text-center">
           <p className={`text-xs ${isValid ? 'text-green-500' : 'text-red-500'}`}>
             {isValid ? 'Form is valid ✓' : 'Please fill in all required fields correctly'}
           </p>
-          {error && (
-            <p className="text-red-500 text-xs mt-1">
-              <span>Login failed</span>
-            </p>
-          )}
+          {loginError && <p className="text-red-500 text-xs mt-1">{loginError}</p>}
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account? <a href="/register" className="text-blue-600 hover:underline">Register</a>
+          </p>
         </div>
       </form>
     </div>

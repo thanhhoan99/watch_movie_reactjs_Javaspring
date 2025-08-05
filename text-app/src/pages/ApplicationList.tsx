@@ -5,7 +5,8 @@ import React, { useEffect, useState } from "react";
 
 import ApplicationForm from "./ApplicationForm";
 import type { Application } from "../types/Application";
-import { deleteApp, getApps } from "../api/applicationApi";
+import { deleteApp, getApps } from "../api/axiosInstance";
+
 
 const ApplicationList: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);

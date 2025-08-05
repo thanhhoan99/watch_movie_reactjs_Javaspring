@@ -7,8 +7,11 @@ import MainLayout from './layouts/MainLayout';
 
 export default function TasksManagementWithZustandAndSecurity() {
   const { loggedInUser } = useAuthStore((state) => state);
+  // const userRoles: string[] =
+  //   loggedInUser?.roles?.map((role: any) => role.code.toLowerCase()) || [];
   const userRoles: string[] =
-    loggedInUser?.roles?.map((role: any) => role.code.toLowerCase()) || [];
+  loggedInUser?.roles?.map((role: any) => role?.name?.toLowerCase()).filter(Boolean) || [];
+  console.log('userRoles:', userRoles);
 
   const getProtectedRoutes = (routes: any[]) => {
     return routes.flatMap((route) => {
@@ -34,6 +37,10 @@ export default function TasksManagementWithZustandAndSecurity() {
     {
       path: '/login',
       element: routes.find((r) => r.path === '/login')?.element,
+    },
+      {
+      path: '/register',
+      element: routes.find((r) => r.path === '/register')?.element,
     },
     {
       path: '/',
