@@ -91,7 +91,8 @@ export default function MainLayout() {
     <Layout style={{ minHeight: '100vh' }}>
       {/* Fixed Sidebar */}
      <Sider
-     className="custom-sider"
+     className="custom-sider shadow-lg"
+     theme="light"
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
@@ -111,14 +112,14 @@ export default function MainLayout() {
             height: 64,
             textAlign: 'center',
             paddingTop: 16,
-            color: 'white',
+            color: 'black',
             fontWeight: 'bold',
           }}
         >
           {collapsed ? '🧾' : loggedInUser.username}
         </div>
         <Menu
-          theme="dark"
+          // theme="light"
           mode="inline"
           selectedKeys={[location.pathname]}
           items={menuItems}
@@ -130,7 +131,7 @@ export default function MainLayout() {
       {/* Main Content */}
       <Layout style={{ marginLeft: siderWidth }}>
         <Header
-          className="shadow-md"
+          className="shadow-lg"
           style={{
             background: '#fff',
             padding: 0,
@@ -157,7 +158,7 @@ export default function MainLayout() {
               }}
             >
               <Space>
-                <Avatar style={{ backgroundColor: '#1677ff' }} size="small">
+                <Avatar style={{ backgroundColor: '#000000' }} size="small">
                   {loggedInUser.username.charAt(0).toUpperCase()}
                 </Avatar>
                 {loggedInUser.username}
