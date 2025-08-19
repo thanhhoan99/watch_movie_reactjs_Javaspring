@@ -4,12 +4,15 @@ import { apiClient } from "../libraries/api-client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-
+interface Role {
+  id: string | number;
+  name: string;
+}
 interface User {
   id: number;
   username: string;
   isActive: boolean;
-  roles: string[];
+  roles: Role[];
 }
 
 // const AVAILABLE_ROLES = ["Administrators", "Users", "Managers"];
@@ -25,7 +28,7 @@ export default function User() {
 
   const isAdmin =
     Array.isArray(loggedInUser?.roles) &&
-    loggedInUser.roles.some((role) => role.name === "Administrators");
+    loggedInUser.roles.some((role: Role) => role.name === "Administrators");
 
   useEffect(() => {
     if (!loggedInUser) {
@@ -41,14 +44,17 @@ export default function User() {
       console.error("Error fetching users:", error);
     }
   };
-const fetchRoles = async () => {
-  try {
-    const response = await apiClient.get("/roles") as string[];
-    setAvailableRoles(response);
-  } catch (error) {
-    console.error("Error fetching roles:", error);
-  }
-};
+  // Fetch danh sách roles từ backend
+  const fetchRoles = async () => {
+    try {
+      const response = await apiClient.get("/roles") as Role[];
+      // Chỉ lấy name để checkbox
+      const roleNames = response.map((role) => role.name);
+      setAvailableRoles(roleNames);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
   
   useEffect(() => {
     if (isAdmin) {
@@ -59,7 +65,8 @@ const fetchRoles = async () => {
 
   const openRoleModal = (user: User) => {
     setSelectedUser(user);
-    setSelectedRoles(user.roles);
+    const roleNames=user.roles.map((role) => role.name);
+    setSelectedRoles(roleNames);
     setShowModal(true);
   };
 
@@ -109,7 +116,7 @@ const fetchRoles = async () => {
               <tr key={user.id}>
                 <td className="border px-2 py-1">{user.id}</td>
                 <td className="border px-2 py-1">{user.username}</td>
-                <td className="border px-2 py-1">{user.roles.join(", ")}</td>
+                <td className="border px-2 py-1">{user.roles.map((role) => role.name).join(", ")}</td>
                 <td className="border px-2 py-1">
                   <button
                     className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
